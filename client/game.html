@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BANG!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="game.css?v=2" />
+</head>
+<body>
+
+<!-- HUD -->
+<header class="hud">
+  <div class="hud-left">
+    <h1 class="game-title">BANG!</h1>
+  </div>
+  <div class="hud-center">
+    <div class="phase-track">
+      <span class="phase-step" data-phase="draw">Rút bài</span>
+      <span class="phase-arrow">›</span>
+      <span class="phase-step active" data-phase="action">Hành động</span>
+      <span class="phase-arrow">›</span>
+      <span class="phase-step" data-phase="end">Kết thúc</span>
+    </div>
+  </div>
+  <div class="hud-right">
+    <span class="turn-badge">Lượt: <strong id="currentPlayerName">—</strong></span>
+    <div class="action-counter">
+      <span class="action-label">Hành động</span>
+      <span class="action-value" id="actionsLeft">3</span>
+    </div>
+    <button class="btn-end-turn" id="endTurnBtn">Kết thúc lượt ›</button>
+  </div>
+</header>
+
+<!-- BOARD WRAPPER -->
+<div class="board-wrap">
+
+  <!-- ── PLAYER TOP-LEFT (P0) ── -->
+  <div class="player-zone pzone-tl" id="player-0" data-player="0">
+    <div class="player-header">
+      <div class="player-avatar" style="--ac:#7C5CBF">⚔</div>
+      <div class="player-info">
+        <span class="player-name" id="p0-name">Người chơi 1</span>
+        <div class="vp-track"><span class="vp-label">VP</span><span class="vp-value" id="p0-vp">0</span></div>
+      </div>
+      <div class="slain-row" id="p0-slain"></div>
+    </div>
+    <div class="party-row" id="p0-party">
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+    </div>
+    <div class="hand-row">
+      <span class="zone-label">Tay bài <em id="p0-hc">(5)</em></span>
+      <div class="hand-cards" id="p0-hand">
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAYER TOP-RIGHT (P1) ── -->
+  <div class="player-zone pzone-tr" id="player-1" data-player="1">
+    <div class="player-header">
+      <div class="player-avatar" style="--ac:#2E7D6B">🏹</div>
+      <div class="player-info">
+        <span class="player-name" id="p1-name">Người chơi 2</span>
+        <div class="vp-track"><span class="vp-label">VP</span><span class="vp-value" id="p1-vp">0</span></div>
+      </div>
+      <div class="slain-row" id="p1-slain"></div>
+    </div>
+    <div class="party-row" id="p1-party">
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+    </div>
+    <div class="hand-row">
+      <span class="zone-label">Tay bài <em id="p1-hc">(5)</em></span>
+      <div class="hand-cards" id="p1-hand">
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CENTER TABLE ── -->
+  <div class="center-table">
+    <div class="table-felt">
+
+      <!-- Left deck column -->
+      <div class="deck-col">
+        <div class="deck-group">
+          <div class="deck-stack" id="mainDeck">
+            <div class="card-back deck-card"></div>
+            <div class="card-back deck-card"></div>
+            <div class="card-back deck-card"></div>
+          </div>
+          <span class="deck-label">Bộ bài</span>
+          <span class="deck-count" id="mainDeckCount">62</span>
+        </div>
+        <div class="deck-group">
+          <div class="discard-pile" id="discardPile"><span class="discard-empty">bỏ bài</span></div>
+          <span class="deck-label">Bỏ bài</span>
+        </div>
+      </div>
+
+      <!-- Monster zone (center) -->
+      <div class="monster-zone">
+        <span class="table-section-label">⚔ Quái Đang Hoạt Động</span>
+        <div class="active-monster-slot" id="activeMonster">
+          <div class="monster-card placeholder">
+            <div class="monster-art">🐲</div>
+            <div class="monster-name">Chưa có quái</div>
+            <div class="monster-stats"></div>
+          </div>
+        </div>
+        <div class="hp-track">
+          <span class="hp-label">HP</span>
+          <div class="hp-bar-wrap"><div class="hp-bar" id="monsterHpBar" style="width:100%"></div></div>
+          <span class="hp-value" id="monsterHp">—</span>
+        </div>
+      </div>
+
+      <!-- Right deck column -->
+      <div class="deck-col">
+        <div class="deck-group">
+          <div class="deck-stack" id="monsterDeck">
+            <div class="card-back deck-card monster-back"></div>
+            <div class="card-back deck-card monster-back"></div>
+            <div class="card-back deck-card monster-back"></div>
+          </div>
+          <span class="deck-label">Bộ quái</span>
+          <span class="deck-count" id="monsterDeckCount">20</span>
+        </div>
+        <div class="deck-group">
+          <div class="deck-stack" id="challengeDeck">
+            <div class="card-back deck-card challenge-back"></div>
+            <div class="card-back deck-card challenge-back"></div>
+            <div class="card-back deck-card challenge-back"></div>
+          </div>
+          <span class="deck-label">Thử thách</span>
+          <span class="deck-count" id="challengeDeckCount">12</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PLAYER BOTTOM-LEFT (P2) ── -->
+  <div class="player-zone pzone-bl" id="player-2" data-player="2">
+    <div class="player-header">
+      <div class="player-avatar" style="--ac:#B5451B">🔥</div>
+      <div class="player-info">
+        <span class="player-name" id="p2-name">Người chơi 3</span>
+        <div class="vp-track"><span class="vp-label">VP</span><span class="vp-value" id="p2-vp">0</span></div>
+      </div>
+      <div class="slain-row" id="p2-slain"></div>
+    </div>
+    <div class="party-row" id="p2-party">
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+    </div>
+    <div class="hand-row">
+      <span class="zone-label">Tay bài <em id="p2-hc">(5)</em></span>
+      <div class="hand-cards" id="p2-hand">
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAYER BOTTOM-RIGHT (P3) ── -->
+  <div class="player-zone pzone-br" id="player-3" data-player="3">
+    <div class="player-header">
+      <div class="player-avatar" style="--ac:#1A6B9A">🌊</div>
+      <div class="player-info">
+        <span class="player-name" id="p3-name">Người chơi 4</span>
+        <div class="vp-track"><span class="vp-label">VP</span><span class="vp-value" id="p3-vp">0</span></div>
+      </div>
+      <div class="slain-row" id="p3-slain"></div>
+    </div>
+    <div class="party-row" id="p3-party">
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+    </div>
+    <div class="hand-row">
+      <span class="zone-label">Tay bài <em id="p3-hc">(5)</em></span>
+      <div class="hand-cards" id="p3-hand">
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div><div class="card-back"></div>
+        <div class="card-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAYER RIGHT/SIDE (P4 – optional 5th) ── -->
+  <div class="player-zone pzone-side" id="player-4" data-player="4">
+    <div class="player-header">
+      <div class="player-avatar" style="--ac:#5D7A22">🌿</div>
+      <div class="player-info">
+        <span class="player-name" id="p4-name">Người chơi 5</span>
+        <div class="vp-track"><span class="vp-label">VP</span><span class="vp-value" id="p4-vp">0</span></div>
+      </div>
+      <div class="slain-row" id="p4-slain"></div>
+    </div>
+    <div class="party-row party-col" id="p4-party">
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+      <div class="card-slot empty"><span>+</span></div>
+    </div>
+    <div class="hand-row">
+      <span class="zone-label">Tay bài <em id="p4-hc">(5)</em></span>
+      <div class="hand-cards hand-col" id="p4-hand">
+        <div class="card-back sm"></div><div class="card-back sm"></div>
+        <div class="card-back sm"></div><div class="card-back sm"></div>
+        <div class="card-back sm"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /board-wrap -->
+
+<!-- DICE OVERLAY -->
+<div class="dice-overlay hidden" id="diceOverlay">
+  <div class="dice-panel">
+    <h3 class="dice-title">🎲 Tung xúc xắc</h3>
+    <div class="dice-faces" id="diceFaces">
+      <div class="die" id="die0">?</div>
+    </div>
+    <p class="dice-context" id="diceContext">Nhấn Tung để tung xúc xắc</p>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn-gold" id="rollBtn">Tung!</button>
+      <button class="btn-ghost" id="closeDiceBtn">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARD DETAIL MODAL -->
+<div class="modal-overlay hidden" id="cardModal">
+  <div class="card-detail-panel">
+    <button class="modal-close" id="closeCardModal">✕</button>
+    <div class="card-detail-art" id="modalArt">🃏</div>
+    <h2 class="card-detail-name" id="modalName">—</h2>
+    <span class="card-detail-type" id="modalType">—</span>
+    <p class="card-detail-text" id="modalText">—</p>
+    <div class="card-detail-stats" id="modalStats"></div>
+    <div class="card-detail-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="log-panel" id="logPanel">
+  <div class="log-header" id="logToggleArea">
+    <span>Nhật ký</span>
+    <button class="log-toggle" id="logToggle">▲</button>
+  </div>
+  <ul class="log-list" id="logList">
+    <li class="log-entry system">Trò chơi bắt đầu. Chúc may mắn!</li>
+  </ul>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="game.js?v=2"></script>
+</body>
+</html>

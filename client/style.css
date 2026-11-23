@@ -1,0 +1,62 @@
+body {
+    min-height: 100vh;
+    padding: clamp(1rem, 6vw, 5rem);
+    background:
+        radial-gradient(ellipse at 50% 0%, #9e583665, transparent 62%),
+        repeating-linear-gradient(90deg, #20130f 0 2px, #271914 3px 100px, #1d100e 101px 103px);
+}
+.container {
+    margin: auto;
+    max-width: 31rem;
+    background: linear-gradient(155deg, #3a241a, #241510 74%);
+    border: 1px solid #a36c3e;
+    border-radius: 1rem;
+    padding: clamp(1rem, 5vw, 2.5rem);
+    box-shadow: 0 18px 50px #100806aa, inset 0 0 0 5px #e7ae6710;
+}
+.lobby-heading { text-align: center; padding: .7rem 0 1.4rem; }
+.lobby-heading .brand { font-size: clamp(3.8rem, 13vw, 6rem); line-height: .95; text-shadow: 3px 4px #722819; }
+.lobby-heading .edition { display: block; margin-bottom: .8rem; text-transform: uppercase; }
+.practice-link {
+    display: flex;
+    justify-content: space-between;
+    padding: .85rem 1rem;
+    color: #2e1b10;
+    background: linear-gradient(#f2d28e, #d9a24e);
+    font-weight: 700;
+    border: 1px solid #f4d796;
+    border-radius: .5rem;
+    text-decoration: none;
+}
+.practice-link:hover, .practice-link:focus-visible { background: #ffe0a1; }
+.container > p, .container section, form { margin-top: 1rem; }
+.container label { display: block; margin: 1rem 0 .4rem; }
+input {
+    display: block;
+    width: 100%;
+    margin-bottom: .65rem;
+    padding: .65rem;
+    border: 1px solid var(--line);
+    border-radius: .35rem;
+    background: #221612;
+    color: var(--ink);
+    font: inherit;
+}
+#createRoomBtn { background: #573021; color: #ffdeb1; border-color: #a86e49; }
+#play-bots { width: 100%; margin-bottom: 1rem; }
+#bot-seat-count { width: 100%; min-height: 44px; margin-bottom: .55rem; }
+#roomCodeInput { text-transform: uppercase; letter-spacing: .16em; }
+#playerList { padding-left: 1.15rem; color: var(--muted); }
+#room { border-top: 1px solid var(--line); padding-top: 1rem; }
+#status { margin-top: 1rem; color: var(--muted); }
+#status:empty { display: none; }
+#open-online:not([hidden]) { margin-top: .8rem; }
+#draft-progress { margin-top: .25rem; color: var(--muted); }
+a { color: var(--gold); }
+#playerList, #status { overflow-wrap: anywhere; }
+@media (max-width: 540px) {
+    body { padding: .65rem; }
+    .container { padding: clamp(.85rem, 4vw, 1.5rem); }
+    #online-lobby :is(button, input) { min-height: 44px; }
+    #createRoomBtn, #joinRoomBtn { width: 100%; }
+}

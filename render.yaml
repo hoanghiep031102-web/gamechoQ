@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: western-card-room
+    runtime: node
+    plan: free
+    buildCommand: npm ci --prefix server && npm run build:public --prefix server
+    startCommand: node server/server.js
+    healthCheckPath: /
+    envVars:
+      - key: BANG_PUBLIC_ONLINE
+        value: "1"

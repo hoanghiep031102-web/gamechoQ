@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BANG! — Bàn chơi</title>
+  <link rel="stylesheet" href="table.css">
+  <script defer src="../game-audio.js"></script>
+  <script defer src="card-catalog.js"></script>
+  <script defer src="characters.js"></script>
+  <script defer src="character-picker.js"></script>
+  <script defer src="card-art.js"></script>
+  <script defer src="turn-flow.js"></script>
+  <script defer src="game-snapshot.js"></script>
+  <script defer src="bot-turn.js"></script>
+  <script defer src="practice-rules.js"></script>
+  <script defer src="game-actions.js"></script>
+  <script defer src="../room-connection.js"></script>
+  <script defer src="online-table.js"></script>
+  <script defer src="game-notices.js"></script>
+  <script defer src="board-effects.js"></script>
+  <script defer src="table-seats.js"></script>
+  <script defer src="practice.js"></script>
+  <script defer src="table.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" id="table-home" href="../index.html" target="_top" aria-label="BANG! — về sảnh">BANG!</a>
+    <span class="edition" id="mode-label">BẢN THẺ BÀI</span>
+    <label for="seat-count">Số người</label>
+    <select id="seat-count">
+      <option value="4">4 người</option><option value="5">5 người</option>
+      <option value="6" selected>6 người</option><option value="7">7 người</option>
+    </select>
+    <button id="reset" type="button">Đặt lại</button>
+    <label id="practice-character-label" hidden>Nhân vật <select id="practice-character"><option value="">Ngẫu nhiên</option></select></label>
+    <span id="online-room" hidden></span>
+    <button class="primary" id="rematch" type="button" hidden>Bắt đầu ván mới</button>
+    <button id="leave-online" type="button" hidden>Rời phòng</button>
+  </header>
+  <div id="notice-dock">
+    <section id="response-banner" aria-label="Cần phản hồi" hidden>
+      <span class="notice-emblem" id="response-emblem" aria-hidden="true">✹</span>
+      <div class="response-copy" role="alert">
+        <span class="response-label" id="response-label">Cần phản hồi</span>
+        <strong id="response-title"></strong>
+        <p id="response-instructions"></p>
+      </div>
+      <button type="button" id="response-jump">Đến phần phản hồi</button>
+    </section>
+  </div>
+  <div id="event-toasts" role="status" aria-live="polite" aria-relevant="additions"></div>
+  <main>
+    <section class="table-section" aria-label="Bàn chơi">
+      <div class="table">
+        <div class="felt"></div>
+        <div id="board-effects" aria-hidden="true"></div>
+        <div id="seats"></div>
+        <div class="center">
+          <div>
+            <div id="turn-notice" role="status" aria-live="polite" aria-atomic="true"></div>
+            <p class="turn" id="turn"></p>
+          </div>
+          <div class="piles">
+            <div><div class="pile back" id="deck-back" aria-hidden="true">✦</div><span id="draw-pile">Bài rút · 54</span></div>
+            <div><div class="pile discard" aria-hidden="true">✧</div><span id="discard-pile">Bài bỏ · 1</span></div>
+          </div>
+          <button id="play-on-table" type="button" class="primary" hidden>Đánh bài</button>
+        </div>
+        <div id="own-seat-slot" hidden></div>
+      </div>
+      <section class="hand-area" aria-labelledby="hand-title">
+        <section id="quick-response" aria-labelledby="quick-response-title" tabindex="-1" hidden>
+          <h2 id="quick-response-title">Phản hồi đòn tấn công</h2>
+          <div class="quick-response-actions">
+            <div id="quick-response-cards"></div>
+            <button id="use-barrel" type="button" hidden>Dùng Barrel</button>
+            <button id="use-jourdonnais" type="button" hidden>Dùng kỹ năng Jourdonnais</button>
+            <button id="take-hit" type="button">Chịu đòn</button>
+          </div>
+        </section>
+        <div class="hand-heading">
+          <h1 id="hand-title" tabindex="-1">Bài trên tay</h1>
+          <button class="primary" id="end-turn" type="button">Kết thúc lượt</button>
+        </div>
+        <div id="hand"></div>
+        <div id="target-picker" hidden>
+          <p id="target-hint" role="status"></p>
+          <div id="target-buttons"></div>
+        </div>
+        <div id="practice-actions" hidden>
+          <button id="use-card" type="button" disabled>Đánh lá này</button>
+          <button id="heal-select" type="button" hidden>Dùng Sid Ketchum</button>
+          <button id="heal-confirm" type="button" hidden>Bỏ 2 lá để hồi máu</button>
+        </div>
+        <section id="effect-panel" aria-labelledby="effect-title" tabindex="-1" hidden>
+          <h2 id="effect-title"></h2>
+          <p id="effect-instructions" hidden></p>
+          <div id="effect-choices"></div>
+        </section>
+        <section id="card-inspector" aria-labelledby="card-inspector-name" hidden>
+          <div id="card-inspector-art" class="card inspector-art" aria-hidden="true"></div>
+          <div aria-live="polite">
+            <p class="label" id="card-inspector-type"></p>
+            <h2 id="card-inspector-name"></h2>
+            <p id="card-inspector-face" hidden></p>
+            <p id="card-inspector-description"></p>
+          </div>
+        </section>
+      </section>
+    </section>
+    <aside>
+      <section>
+        <p class="label">VAI TRÒ CỦA BẠN</p>
+        <h2 id="your-role">Cảnh sát trưởng</h2>
+        <p id="role-goal">Loại hết Tội phạm và Kẻ phản bội.</p>
+      </section>
+      <section id="character-summary" hidden>
+        <p class="label">NHÂN VẬT CỦA BẠN</p>
+        <button type="button" id="your-character"></button>
+        <p id="character-ability"></p>
+      </section>
+      <section>
+        <h2>Trạng thái</h2>
+        <p id="detail" role="status">Chọn một lá trên tay để xem mô tả.</p>
+      </section>
+      <section>
+        <h2>Nhật ký</h2>
+        <ol id="log" aria-live="polite"></ol>
+      </section>
+    </aside>
+  </main>
+  <dialog id="card-choice-dialog" aria-labelledby="card-choice-title" aria-describedby="card-choice-instruction">
+    <h2 id="card-choice-title"></h2>
+    <p id="card-choice-instruction"></p>
+    <div id="card-choice-options"></div>
+  </dialog>
+  <dialog id="discard-dialog" aria-labelledby="discard-title" aria-describedby="discard-instruction">
+    <h2 id="discard-title">Bỏ bài cuối lượt</h2>
+    <p id="discard-instruction"></p>
+    <div id="discard-options"></div>
+    <div class="discard-confirm-row">
+      <p id="discard-feedback" role="status"></p>
+      <button class="primary" id="discard-confirm" type="button" disabled></button>
+    </div>
+  </dialog>
+  <dialog id="practice-draft" aria-labelledby="practice-draft-title">
+    <h2 id="practice-draft-title">Chọn một trong hai nhân vật</h2>
+    <div class="character-options" id="practice-draft-options"></div>
+  </dialog>
+  <dialog id="role-reveal" aria-labelledby="role-reveal-name" aria-describedby="role-reveal-goal">
+    <p class="label">VAI TRÒ CỦA BẠN</p>
+    <h2 id="role-reveal-name"></h2>
+    <p id="role-reveal-goal"></p>
+    <p id="role-reveal-visibility"></p>
+    <h2 id="role-reveal-character"></h2>
+    <p id="role-reveal-ability"></p>
+    <form method="dialog">
+      <button class="primary" autofocus>Vào bàn chơi</button>
+    </form>
+  </dialog>
+  <dialog id="character-detail" aria-labelledby="character-name" aria-describedby="character-description">
+    <img id="character-art" alt="">
+    <div>
+      <p class="label" id="character-holder"></p>
+      <h2 id="character-name"></h2>
+      <p id="character-description"></p>
+      <form method="dialog"><button class="primary" autofocus>Đóng</button></form>
+    </div>
+  </dialog>
+  <dialog id="equipment-detail" aria-labelledby="equipment-name" aria-describedby="equipment-description">
+    <div id="equipment-art" class="card blue" aria-hidden="true"></div>
+    <div>
+      <p class="label" id="equipment-holder"></p>
+      <h2 id="equipment-name"></h2>
+      <p id="equipment-description"></p>
+      <form method="dialog">
+        <button class="primary" autofocus>Đóng</button>
+        <button type="button" id="equipment-discard" hidden>Hủy</button>
+      </form>
+    </div>
+  </dialog>
+</body>
+</html>

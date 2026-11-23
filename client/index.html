@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BANG! — Phòng chơi</title>
+    <link rel="stylesheet" href="bang/table.css">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="game-audio.js"></script>
+    <script defer src="room-connection.js"></script>
+    <script defer src="bang/characters.js"></script>
+    <script defer src="bang/character-picker.js"></script>
+    <script defer src="code.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="lobby-heading">
+            <p class="edition">Bản thẻ bài · 4–7 người</p>
+            <h1 class="brand">BANG!</h1>
+        </header>
+        <a class="practice-link" href="bang/index.html?mode=practice">Chơi với máy <span aria-hidden="true">↗</span></a>
+        <div id="online-lobby">
+            <label for="bot-seat-count">Số người khi chơi với máy</label>
+            <select id="bot-seat-count">
+                <option value="4">4 người · Bạn và 3 máy</option>
+                <option value="5">5 người · Bạn và 4 máy</option>
+                <option value="6">6 người · Bạn và 5 máy</option>
+                <option value="7">7 người · Bạn và 6 máy</option>
+            </select>
+            <button class="practice-link" id="play-bots" type="button" disabled>Chơi với máy online</button>
+            <label for="playerName">Tên của bạn</label>
+            <input id="playerName" maxlength="30" autocomplete="nickname">
+            <button class="primary" id="createRoomBtn" type="button" disabled>Tạo phòng mới</button>
+            <form id="joinRoom">
+                <label for="roomCodeInput">Mã phòng</label>
+                <input id="roomCodeInput" maxlength="6" autocomplete="off" required>
+                <button id="joinRoomBtn" disabled>Vào phòng</button>
+            </form>
+            <p id="status" role="status">Đang kết nối…</p>
+            <p id="open-online" hidden><a href="http://localhost:3000/">Mở sảnh online để tạo hoặc vào phòng</a></p>
+            <section id="room" hidden>
+                <h2 id="roomCode"></h2>
+                <section id="character-draft" aria-labelledby="draft-title" hidden>
+                    <h2 id="draft-title">Chọn một nhân vật</h2>
+                    <p id="draft-progress" role="status"></p>
+                    <div class="character-options" id="draft-options"></div>
+                </section>
+                <ul id="playerList"></ul>
+                <button class="primary" id="startGameBtn" type="button" hidden>Bắt đầu ván</button>
+                <button id="leaveRoomBtn" type="button">Rời phòng</button>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
